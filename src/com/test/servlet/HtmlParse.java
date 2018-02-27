@@ -70,22 +70,34 @@ public class HtmlParse extends HttpServlet {
 		
 		StringBuffer sb = new StringBuffer();
 		ArrayList<MovieInfo> list = new ArrayList<>();
+		Elements links = doc.select("div.thumb a[href]");
 		Elements img = doc.select("div.thumb img[src]");
 		int idx = 0;
+		ArrayList<String> linkList = new ArrayList<>();
+		for (Element link : links) {
+			linkList.add("http://movie.naver.com" + link.attr("href"));
+			//System.out.println(link.attr("href"));
+		}
 		
 		for (Element eTimg : img) {
+			String href = eTimg.attr("src");
 			String imgSrc = eTimg.attr("src");
 			String tit = eTimg.attr("alt");
 			String [] img1 = imgSrc.split("\\?");
 			sb.append("img 주소: " + img1[0] + ", ");
+			System.out.println(href);
 //			System.out.println(img1[0]);
 //			System.out.println(tit);
+
 			sb.append("타이틀: " + tit + ", ");
 			MovieInfo bean = new MovieInfo();
 			bean.setImg(img1[0]);
 			bean.setTitle(tit);
+			bean.setLink(linkList.get(idx++));
 			list.add(bean);
 		}
+		System.out.println(linkList.size());
+		System.out.println(list.size());
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		Gson gson = new Gson();
@@ -104,6 +116,14 @@ public class HtmlParse extends HttpServlet {
 	class MovieInfo {
 		private String img;
 		private String title;
+		private String link;
+		
+		public String getLink() {
+			return link;
+		}
+		public void setLink(String link) {
+			this.link = link;
+		}
 		public String getImg() {
 			return img;
 		}
